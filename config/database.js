@@ -2,7 +2,9 @@ const mongoose = require('mongoose');
 
 
 const connectDatabase = () =>{
+    // mongoose.connect("mongodb://localhost:27017/maxtoys", {
     mongoose.connect("mongodb+srv://atif:atif@cluster0.ddngw.mongodb.net/maxtoys?retryWrites=true&w=majority", {
+
         useNewUrlParser: true,
         useUnifiedTopology: true,
         // useCreateIndex: true  //error

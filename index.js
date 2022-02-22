@@ -20,7 +20,8 @@ const newMaxtoysData = async (req, res, next) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ success: false, errors: errors.array() });
   }
-  const maxtoys = await Maxtoys.create(req.body);
+  // const maxtoys = await Maxtoys.create(req.body);
+  const maxtoys = await Maxtoys.insertOne(req.body);
   res.status(201).json({
     success: true,
     maxtoys,
