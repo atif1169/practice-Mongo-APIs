@@ -2,39 +2,38 @@ const mongooes = require('mongoose');
 
 
 const maxtoysSchema = new mongooes.Schema({
+    name:{
+        type: String,
+        required: true,
+    },
     time:{
         type: Date,
         default: Date.now
     },
     length:{
         type: Number,
-        required: [true, 'Please enter length'],
-        // default: 0
+        required: true,
     },
     width:{
         type: Number,
-        required: [true, 'Please enter width'],
-        // default: 0
+        required: true,
     },
     height:{
         type: Number,
-        required: [true, 'Please enter height'],
-        // default: 0
+        required:true,
     },
     barcode:{
         type:Number,
-        required: [true, 'Please enter barcode'],
-        default: 0
+        required: true,
+        default:123456789,
     },
     shape:{
         type: String,
-        required: [true, 'Please enter shape'],
-        // default: "shape"
+        required: true,
     },
     device:{
         type: String,
-        required:[true, 'Please enter device'],
-        // default: "device"
+        required:true,
     },
     image: {
         type: String

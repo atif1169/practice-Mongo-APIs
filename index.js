@@ -1,5 +1,4 @@
 const express = require("express");
-const { status } = require("express/lib/response");
 const app = express();
 const connectDatabase = require("./config/database");
 const port = process.env.PORT || 3000;
@@ -33,6 +32,7 @@ const newMaxtoysData = async (req, res, next) => {
 app.post(
   "/newMaxtoys",
   [
+    body("name", "enter name").isLength({ min: 4 }),
     body("length", "enter length").isLength({ min: 1 }),
     body("width", "enter width").isLength({ min: 1 }),
     body("height", "enter height").isLength({ min: 1 }),
@@ -48,10 +48,22 @@ app.post(
 
 
 const getMextoys = async(req, res, next)=>{
-    const maxtoys = await Maxtoys.find();
+  // console.log(req.query.no);
+
+  const totalCount = await Maxtoys.countDocuments();
+
+  let pageNo =req.query.page_no;
+  let perPage = req.query.rowPerPage; 
+  const maxtoys = await Maxtoys.find()
+    .skip((pageNo-1) * perPage )
+    .limit(perPage);
+
     res.status(200).json({
         success: true,
+        totalCount,
         count : maxtoys.length,
+        pageNo,
+        perPage,
         maxtoys
     })
 }
