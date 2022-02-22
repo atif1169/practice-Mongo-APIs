@@ -22,6 +22,7 @@ const newMaxtoysData = async (req, res, next) => {
   }
 
   const maxtoys = await Maxtoys.create(req.body);
+
   res.status(201).json({
     success: true,
     maxtoys,
