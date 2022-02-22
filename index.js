@@ -20,6 +20,7 @@ const newMaxtoysData = async (req, res, next) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ success: false, errors: errors.array() });
   }
+
   const maxtoys = await Maxtoys.create(req.body);
   res.status(201).json({
     success: true,
@@ -54,6 +55,8 @@ const getMextoys = async(req, res, next)=>{
     })
 }
 app.get("/getMaxtoys", getMextoys);
+
+
 
 app.get("/test", (req, resp) => {
   resp.json({
