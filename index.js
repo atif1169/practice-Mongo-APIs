@@ -21,11 +21,13 @@ const newMaxtoysData = async (req, res, next) => {
     return res.status(400).json({ success: false, errors: errors.array() });
   }
   // const maxtoys = await Maxtoys.create(req.body);
-  const maxtoys = await Maxtoys.insertOne(req.body);
-  res.status(201).json({
-    success: true,
-    maxtoys,
-  });
+  const maxtoys = await Maxtoys(req.body);
+  maxtoys.save().then(res =>{
+    res.status(201).json({
+      success: true,
+      maxtoys,
+    });
+  }).catch(err=> console.log(err))
 };
 
 //Route for save data
