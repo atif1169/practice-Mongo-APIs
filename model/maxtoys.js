@@ -2,10 +2,6 @@ const mongooes = require('mongoose');
 
 
 const maxtoysSchema = new mongooes.Schema({
-    name:{
-        type: String,
-        required: true,
-    },
     time:{
         type: Date,
         default: Date.now
@@ -37,7 +33,16 @@ const maxtoysSchema = new mongooes.Schema({
     },
     image: {
         type: String
-    }
+    },
+    name : {
+        type : String
+    },
+    customer : {
+        type : String
+    },
+    supplier : {
+        type : String
+    },
     
 })
 

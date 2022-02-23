@@ -10,8 +10,8 @@ connectDatabase();
 
 app.use(express.json());
 
-//----------------------------------------Post data to mongodb----------------------------------
-//----------------------------------------Post data to mongodb----------------------------------
+//----------------------------------------Post Add data to mongodb----------------------------------
+//----------------------------------------Post Add  data to mongodb----------------------------------
 
 // function save data to mongodb
 const newMaxtoysData = async (req, res, next) => {
@@ -32,7 +32,6 @@ const newMaxtoysData = async (req, res, next) => {
 app.post(
   "/newMaxtoys",
   [
-    body("name", "enter name").isLength({ min: 4 }),
     body("length", "enter length").isLength({ min: 1 }),
     body("width", "enter width").isLength({ min: 1 }),
     body("height", "enter height").isLength({ min: 1 }),
@@ -43,9 +42,13 @@ app.post(
   newMaxtoysData
 );
 
-//-----------------------------------------------Post data to mongodb----------------------------------
-//-----------------------------------------------Post data to mongodb----------------------------------
+//-----------------------------------------------Post  Add data to mongodb----------------------------------
+//-----------------------------------------------Post Add  data to mongodb----------------------------------
 
+
+
+//------------------------------------------------Get data to mongodb----------------------------------
+//------------------------------------------------Get data to mongodb----------------------------------
 
 const getMextoys = async(req, res, next)=>{
   // console.log(req.query.no);
@@ -69,6 +72,36 @@ const getMextoys = async(req, res, next)=>{
 }
 app.get("/getMaxtoys", getMextoys);
 
+//------------------------------------------------Get data to mongodb----------------------------------
+//------------------------------------------------Get data to mongodb----------------------------------
+
+
+
+//------------------------------------------------update data to mongodb----------------------------------
+//------------------------------------------------update data to mongodb----------------------------------
+
+const updateMaxData = async (req, res, next) => {
+  try {
+    const updateData = await Maxtoys.findByIdAndUpdate(
+      { _id: req.query._id },
+      {
+        $set: {
+          name: req.query.name,
+          customer: req.query.customer,
+          supplier: req.query.supplier,
+        },
+      }
+    );
+    console.log(updateData);
+  } catch (er) {
+    console.log(er);
+  }
+};
+
+
+app.get("/update", updateMaxData)
+//------------------------------------------------update data to mongodb----------------------------------
+//------------------------------------------------update data to mongodb----------------------------------
 
 
 app.get("/test", (req, resp) => {
