@@ -4,6 +4,7 @@ const connectDatabase = require("./config/database");
 const port = process.env.PORT || 3000;
 const Maxtoys = require("./model/maxtoys");
 const { body, validationResult } = require("express-validator");
+const { get } = require("express/lib/response");
 
 // database Connection
 connectDatabase();
@@ -50,26 +51,50 @@ app.post(
 //------------------------------------------------Get data to mongodb----------------------------------
 //------------------------------------------------Get data to mongodb----------------------------------
 
-const getMextoys = async(req, res, next)=>{
-  // console.log(req.query.no);
+const getMextoys = async (req, res, next) => {
 
   const totalCount = await Maxtoys.countDocuments();
 
-  let pageNo =req.query.page_no;
-  let perPage = req.query.rowPerPage; 
+  //----------search query exist--------------
+  if (req.query.search) {
+    let pageNo = req.query.page_no;
+    let perPage = req.query.rowPerPage;
+    let searchTerm = await Maxtoys.find({
+      $or: [
+        { name: { $regex: req.query.search } },
+        { customer: { $regex: req.query.search } },
+        { supplier: { $regex: req.query.search } },
+        { device: { $regex: req.query.search } },
+        { shape: { $regex: req.query.search } },
+        // { barcode : { $regex : req.query.search  }},
+      ],
+    });
+    return res.json({
+      success: true,
+      totalCount,
+      count: searchTerm.length,
+      pageNo,
+      perPage,
+      maxtoys: searchTerm,
+    });
+  }
+
+  //----------search query no exist--------------
+  let pageNo = req.query.page_no;
+  let perPage = req.query.rowPerPage;
   const maxtoys = await Maxtoys.find()
-    .skip((pageNo-1) * perPage )
+    .skip((pageNo - 1) * perPage)
     .limit(perPage);
 
-    res.status(200).json({
-        success: true,
-        totalCount,
-        count : maxtoys.length,
-        pageNo,
-        perPage,
-        maxtoys
-    })
-}
+  return res.status(200).json({
+    success: true,
+    totalCount,
+    count: maxtoys.length,
+    pageNo,
+    perPage,
+    maxtoys,
+  });
+};
 app.get("/getMaxtoys", getMextoys);
 
 //------------------------------------------------Get data to mongodb----------------------------------
@@ -101,10 +126,47 @@ const updateMaxData = async (req, res, next) => {
   }
 };
 
-
 app.get("/update", updateMaxData)
 //------------------------------------------------update data to mongodb----------------------------------
 //------------------------------------------------update data to mongodb----------------------------------
+
+
+
+
+//------------------------------------------------search data to mongodb----------------------------------
+//------------------------------------------------search data to mongodb----------------------------------
+
+const searchApi = ( req, res ) =>{
+  // let searchTerm = new RegExp(req.query.search, 'i');
+  Maxtoys.find( 
+    { 
+      "$or":[
+        { "name" : { $regex : req.query.search }},
+        { "customer" : { $regex : req.query.search }},
+        { "supplier" : { $regex : req.query.search }},
+        { "device" : { $regex : req.query.search }},
+        { "shape" : { $regex : req.query.search }},
+        // { "barcode" : { $regex : req.query.search  }},
+        // { "height" : { $regex : searchTerm }},
+        // { "width" : { $regex : searchTerm }},
+        // { "length" : { $regex : searchTerm }},
+        // { "time" : { $regex : searchTerm }},
+      ]
+  } 
+  ).then((result) =>{
+    res.json({
+      success: true,
+      count: result.length,
+      result
+    })
+  })
+}
+
+app.get('/search', searchApi);
+//------------------------------------------------search data to mongodb----------------------------------
+//------------------------------------------------search data to mongodb----------------------------------
+
+
 
 
 app.get("/test", (req, resp) => {
