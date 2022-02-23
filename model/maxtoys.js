@@ -7,19 +7,19 @@ const maxtoysSchema = new mongooes.Schema({
         default: Date.now
     },
     length:{
-        type: Number,
+        type: String,
         required: true,
     },
     width:{
-        type: Number,
+        type: String,
         required: true,
     },
     height:{
-        type: Number,
+        type: String,
         required:true,
     },
     barcode:{
-        type:Number,
+        type:String,
         required: true,
         default:123456789,
     },

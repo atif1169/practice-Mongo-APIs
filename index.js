@@ -59,23 +59,27 @@ const getMextoys = async (req, res, next) => {
   if (req.query.search) {
     let pageNo = req.query.page_no;
     let perPage = req.query.rowPerPage;
-    let searchTerm = await Maxtoys.find({
+    let searchTerm = new RegExp(req.query.search, 'i');
+    let search_term = await Maxtoys.find({
       $or: [
-        { name: { $regex: req.query.search } },
-        { customer: { $regex: req.query.search } },
-        { supplier: { $regex: req.query.search } },
-        { device: { $regex: req.query.search } },
-        { shape: { $regex: req.query.search } },
-        // { barcode : { $regex : req.query.search  }},
+        { name: searchTerm },
+        { customer: searchTerm },
+        { supplier: searchTerm },
+        { barcode: searchTerm },
+        { height: searchTerm },
+        { width: searchTerm },
+        { length: searchTerm },
+        { device: searchTerm },
+        { shape: searchTerm },
       ],
     });
     return res.json({
       success: true,
       totalCount,
-      count: searchTerm.length,
+      count: search_term.length,
       pageNo,
       perPage,
-      maxtoys: searchTerm,
+      maxtoys: search_term,
     });
   }
 
@@ -137,20 +141,19 @@ app.get("/update", updateMaxData)
 //------------------------------------------------search data to mongodb----------------------------------
 
 const searchApi = ( req, res ) =>{
-  // let searchTerm = new RegExp(req.query.search, 'i');
+  let searchTerm = new RegExp(req.query.search, 'i');
   Maxtoys.find( 
     { 
       "$or":[
-        { "name" : { $regex : req.query.search }},
-        { "customer" : { $regex : req.query.search }},
-        { "supplier" : { $regex : req.query.search }},
-        { "device" : { $regex : req.query.search }},
-        { "shape" : { $regex : req.query.search }},
-        // { "barcode" : { $regex : req.query.search  }},
-        // { "height" : { $regex : searchTerm }},
-        // { "width" : { $regex : searchTerm }},
-        // { "length" : { $regex : searchTerm }},
-        // { "time" : { $regex : searchTerm }},
+        { "name" : searchTerm },
+        { "customer" : searchTerm},
+        { "supplier" : searchTerm},
+        { "barcode" : searchTerm},
+        { "height" : searchTerm},
+        { "width" : searchTerm},
+        { "length" : searchTerm},
+        { "device" : searchTerm},
+        { "shape" : searchTerm},
       ]
   } 
   ).then((result) =>{
