@@ -82,7 +82,7 @@ app.get("/getMaxtoys", getMextoys);
 
 const updateMaxData = async (req, res, next) => {
   try {
-    const updateData = await Maxtoys.findByIdAndUpdate(
+    let maxtoys = await Maxtoys.findByIdAndUpdate(
       { _id: req.query._id },
       {
         $set: {
@@ -91,8 +91,11 @@ const updateMaxData = async (req, res, next) => {
           supplier: req.query.supplier,
         },
       }
-    );
-    console.log(updateData);
+    ); 
+    res.json({
+      success : true,
+      message : "Successfully updated"
+    })
   } catch (er) {
     console.log(er);
   }
