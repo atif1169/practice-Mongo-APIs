@@ -4,12 +4,65 @@ const connectDatabase = require("./config/database");
 const port = process.env.PORT || 3000;
 const Maxtoys = require("./model/maxtoys");
 const { body, validationResult } = require("express-validator");
-const { get } = require("express/lib/response");
+
+const Mongoose = require("mongoose");
+const Bcrypt = require("bcryptjs");
+
+const Admin = require('./model/admin')
 
 // database Connection
 connectDatabase();
 
 app.use(express.json());
+
+
+
+//----------------------------------------Add admin & Login----------------------------------
+
+
+app.post("/admin", async (request, response) => {
+  try {
+      request.body.password = Bcrypt.hashSync(request.body.password, 10);
+      var user = new Admin(request.body);
+      var result = await user.save();
+      response.send(result);
+  } catch (error) {
+      response.status(500).send(error);
+  }
+});
+
+app.post("/login", async (request, response) => {
+  try {
+      var user = await Admin.findOne({ username: request.body.username }).exec();
+      if(!user) {
+          return response.status(400).send({
+              success : false,
+              message: "The admin does not exist"
+             });
+      }
+      if(!Bcrypt.compareSync(request.body.password, user.password)) {
+          return response.status(400).send({
+            success : false,
+             message: "The password is invalid"
+             });
+      }
+      response.send({
+        success : true,
+         message: "Admin successfully login."
+         });
+  } catch (error) {
+      response.status(500).send(error);
+  }
+});
+
+
+
+
+
+//----------------------------------------Add admin to mongodb----------------------------------
+
+
+
 
 //----------------------------------------Post Add data to mongodb----------------------------------
 //----------------------------------------Post Add  data to mongodb----------------------------------
