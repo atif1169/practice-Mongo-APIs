@@ -55,7 +55,7 @@ app.post("/login", async (request, response) => {
         },
          'maxtoys',
         {
-          expiresIn : 60
+          expiresIn : "30000ms"
         } 
         );
       response.send({
