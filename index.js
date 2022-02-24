@@ -9,6 +9,7 @@ const Mongoose = require("mongoose");
 const Bcrypt = require("bcryptjs");
 
 const Admin = require('./model/admin')
+var jwt = require('jsonwebtoken');
 
 // database Connection
 connectDatabase();
@@ -46,9 +47,21 @@ app.post("/login", async (request, response) => {
              message: "The password is invalid"
              });
       }
+      //jwt Token
+      const token = jwt.sign(
+        {
+          username : request.body.username,
+          password : request.body.password,
+        },
+         'maxtoys',
+        {
+          expiresIn : 60
+        } 
+        );
       response.send({
         success : true,
-         message: "Admin successfully login."
+         message: "Admin successfully login.",
+         token
          });
   } catch (error) {
       response.status(500).send(error);
