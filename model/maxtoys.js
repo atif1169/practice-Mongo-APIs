@@ -3,7 +3,7 @@ const mongooes = require('mongoose');
 
 const maxtoysSchema = new mongooes.Schema({
     time:{
-        type: Date,
+        type: String,
         default: Date.now
     },
     length:{

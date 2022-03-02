@@ -10,13 +10,20 @@ const Bcrypt = require("bcryptjs");
 
 const Admin = require('./model/admin')
 var jwt = require('jsonwebtoken');
+const multer = require('multer');
+const path = require('path')
+var bodyParser = require('body-parser');
+const timestamp = require('time-stamp');
 
 // database Connection
 connectDatabase();
 
-app.use(express.json());
+// app.use(express.json());
 
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
+console.log(timestamp('MM/DD/YYYY HH:mm:ss'));
 
 //----------------------------------------Add admin & Login----------------------------------
 
@@ -51,11 +58,11 @@ app.post("/login", async (request, response) => {
       const token = jwt.sign(
         {
           username : request.body.username,
-          password : request.body.password,
+          password : request.body.password
         },
          'maxtoys',
         {
-          expiresIn : "60s"
+          expiresIn : "24h"
         } 
         );
       response.send({
@@ -68,17 +75,26 @@ app.post("/login", async (request, response) => {
   }
 });
 
-
-
-
-
 //----------------------------------------Add admin to mongodb----------------------------------
-
 
 
 
 //----------------------------------------Post Add data to mongodb----------------------------------
 //----------------------------------------Post Add  data to mongodb----------------------------------
+
+//=========================================for upload image=================
+// const storage = multer.diskStorage({
+//   destination : './upload/images',
+//   filename:  function(req, file, cb){
+//     cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname) );
+//   } 
+// })
+
+// const imageUpload = multer({
+//   storage: storage
+// })
+//=========================================for upload image=================
+
 
 // function save data to mongodb
 const newMaxtoysData = async (req, res, next) => {
@@ -86,18 +102,27 @@ const newMaxtoysData = async (req, res, next) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ success: false, errors: errors.array() });
   }
+//------------------------for upload image
+// console.log(req.file);
+// console.log(req.body);
 
+req.body.time =timestamp('MM/DD/YYYY HH:mm:ss');
   const maxtoys = await Maxtoys.create(req.body);
 
   res.status(201).json({
     success: true,
+    //------------------------for upload image
+    // image: `http://localhost:3000/image/${req.file.filename}`,
     maxtoys,
   });
 };
 
+app.use('/image', express.static('./upload/images'))
 //Route for save data
 app.post(
   "/newMaxtoys",
+  //------------------------for upload image
+  // imageUpload.single('image'),
   [
     body("length", "enter length").isLength({ min: 1 }),
     body("width", "enter width").isLength({ min: 1 }),
@@ -105,7 +130,7 @@ app.post(
     // body('barcode', "enter barcode").isLength({ min: 5 }),
     body("shape", "enter shape").isLength({ min: 4 }),
     body("device", "enter device").isLength({ min: 4 }),
-  ],
+  ], 
   newMaxtoysData
 );
 
