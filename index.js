@@ -91,7 +91,8 @@ const storage = multer.diskStorage({
 })
 
 const imageUpload = multer({
-  storage: storage
+  storage: storage,
+  limits : { fileSize : 524288 }
 })
 //=========================================for upload image=================
 
@@ -104,12 +105,11 @@ const newMaxtoysData = async (req, res, next) => {
   }
 //------------------------for upload image
 // console.log(req.file);
-// console.log(req.body);
 
 req.body.time =timestamp('MM/DD/YYYY HH:mm:ss');
-console.log(`http://localhost:3000/image/${req.file.filename}`);
-console.log(`https://maxtoys-api.herokuapp.com/image/${req.file.filename}`);
-const imageUrl =`https://maxtoys-api.herokuapp.com/image/${req.file.filename}`
+// console.log(`http://localhost:3000/image/${req.file.filename}`);
+// console.log(`https://maxtoys-api.herokuapp.com/image/${req.file.filename}`);
+const imageUrl =`https://maxtoys-api.herokuapp.com/image/${req.file.filename}`;
 req.body.image =imageUrl;
   const maxtoys = await Maxtoys.create(req.body);
 
@@ -139,7 +139,15 @@ app.post(
 
 //-----------------------------------------------Post  Add data to mongodb----------------------------------
 //-----------------------------------------------Post Add  data to mongodb----------------------------------
-
+function errHandler(err, req, res, next){
+  if(err instanceof multer.MulterError){
+    res.json({
+      success:false,
+      message : err.message
+    })
+  }
+}
+app.use(errHandler);
 //------------------------------------------------Get data to mongodb----------------------------------
 //------------------------------------------------Get data to mongodb----------------------------------
 
