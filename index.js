@@ -83,16 +83,16 @@ app.post("/login", async (request, response) => {
 //----------------------------------------Post Add  data to mongodb----------------------------------
 
 //=========================================for upload image=================
-// const storage = multer.diskStorage({
-//   destination : './upload/images',
-//   filename:  function(req, file, cb){
-//     cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname) );
-//   } 
-// })
+const storage = multer.diskStorage({
+  destination : './upload/images',
+  filename:  function(req, file, cb){
+    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname) );
+  } 
+})
 
-// const imageUpload = multer({
-//   storage: storage
-// })
+const imageUpload = multer({
+  storage: storage
+})
 //=========================================for upload image=================
 
 
@@ -107,6 +107,10 @@ const newMaxtoysData = async (req, res, next) => {
 // console.log(req.body);
 
 req.body.time =timestamp('MM/DD/YYYY HH:mm:ss');
+console.log(`http://localhost:3000/image/${req.file.filename}`);
+console.log(`https://maxtoys-api.herokuapp.com/images/${req.file.filename}`);
+const imageUrl =`https://maxtoys-api.herokuapp.com/images/${req.file.filename}`
+req.body.image =imageUrl;
   const maxtoys = await Maxtoys.create(req.body);
 
   res.status(201).json({
@@ -122,7 +126,7 @@ app.use('/image', express.static('./upload/images'))
 app.post(
   "/newMaxtoys",
   //------------------------for upload image
-  // imageUpload.single('image'),
+  imageUpload.single('image'),
   [
     body("length", "enter length").isLength({ min: 1 }),
     body("width", "enter width").isLength({ min: 1 }),
