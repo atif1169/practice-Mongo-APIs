@@ -109,7 +109,7 @@ const newMaxtoysData = async (req, res, next) => {
 req.body.time =timestamp('MM/DD/YYYY HH:mm:ss');
 console.log(`http://localhost:3000/image/${req.file.filename}`);
 console.log(`https://maxtoys-api.herokuapp.com/image/${req.file.filename}`);
-const imageUrl =`https://maxtoys-api.herokuapp.com/images/${req.file.filename}`
+const imageUrl =`https://maxtoys-api.herokuapp.com/image/${req.file.filename}`
 req.body.image =imageUrl;
   const maxtoys = await Maxtoys.create(req.body);
 
