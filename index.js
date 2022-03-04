@@ -233,7 +233,7 @@ const getMextoys = async (req, res, next) => {
     maxtoys,
   });
 };
-app.get("/getMaxtoys", getMextoys);
+app.get("/getMaxtoys", verifyToken, getMextoys);
 
 //------------------------------------------------Get data to mongodb----------------------------------
 //------------------------------------------------Get data to mongodb----------------------------------
