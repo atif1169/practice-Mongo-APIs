@@ -85,7 +85,7 @@ const verifyToken = (req, res, next) => {
       } else {
         req.jwt = jwt.verify(authorization[1], "maxtoys", (err, authData) => {
           if (err) {
-            return res.status(403).json({ result: err });
+            return res.status(500).json({ result: err , status:500});
           }
           // user
           // return res.json({authData})
@@ -204,6 +204,7 @@ const getMextoys = async (req, res, next) => {
 
     return res.json({
       success: true,
+      status:200,
       totalCount,
       count: search_term.length,
       pageNo,
@@ -226,6 +227,7 @@ const getMextoys = async (req, res, next) => {
 
   return res.status(200).json({
     success: true,
+    status:200,
     totalCount,
     count: maxtoys.length,
     pageNo,
