@@ -85,7 +85,7 @@ const verifyToken = (req, res, next) => {
       } else {
         req.jwt = jwt.verify(authorization[1], "maxtoys", (err, authData) => {
           if (err) {
-            return res.status(500).json({ result: err , status:500});
+            return res.json({ result: err , status:500});
           }
           // user
           // return res.json({authData})
