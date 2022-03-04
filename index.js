@@ -33,7 +33,18 @@ app.post("/admin", async (request, response) => {
       request.body.password = Bcrypt.hashSync(request.body.password, 10);
       var user = new Admin(request.body);
       var result = await user.save();
-      response.send(result);
+       //jwt Token
+       const token = jwt.sign(
+        {
+          username : request.body.username,
+          password : request.body.password
+        },
+         'maxtoys',
+        {
+          expiresIn : "24h"
+        } 
+        );
+      response.json({result,token});
   } catch (error) {
       response.status(500).send(error);
   }
@@ -75,6 +86,32 @@ app.post("/login", async (request, response) => {
   }
 });
 
+//*************************************Verify Token**************************
+
+const verifyToken =(req, res, next) => {
+  if (req.headers['authorization']) {
+      try {
+          let authorization = req.headers['authorization'].split(' ');
+          if (authorization[0] !== 'Bearer') {
+              return res.status(401).send('invalid request'); //invalid request
+          } else {
+              req.jwt = jwt.verify(authorization[1], 'maxtoys', (err, authData)=>{
+                if(err){
+                  res.json({result : err})
+                }
+                // user
+                  res.json({authData})
+              });
+              return next();
+          }
+      } catch (err) {
+          return res.status(403).send(); //invalid token
+      }
+  } else {
+      return res.status(401).send('invalid request');
+  }
+}
+//*************************************Verify Token**************************
 //----------------------------------------Add admin to mongodb----------------------------------
 
 
@@ -206,7 +243,7 @@ const getMextoys = async (req, res, next) => {
     maxtoys,
   });
 };
-app.get("/getMaxtoys", getMextoys);
+app.get("/getMaxtoys", verifyToken , getMextoys);
 
 //------------------------------------------------Get data to mongodb----------------------------------
 //------------------------------------------------Get data to mongodb----------------------------------
