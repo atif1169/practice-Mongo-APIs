@@ -61,7 +61,7 @@ app.post("/login", async (request, response) => {
       },
       "maxtoys",     // secrat key
       {
-        expiresIn: "5h",
+        expiresIn: "30S",
       }
     );
     response.send({
