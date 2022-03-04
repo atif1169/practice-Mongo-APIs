@@ -8,12 +8,12 @@ const { body, validationResult } = require("express-validator");
 const Mongoose = require("mongoose");
 const Bcrypt = require("bcryptjs");
 
-const Admin = require('./model/admin')
-var jwt = require('jsonwebtoken');
-const multer = require('multer');
-const path = require('path')
-var bodyParser = require('body-parser');
-const timestamp = require('time-stamp');
+const Admin = require("./model/admin");
+var jwt = require("jsonwebtoken");
+const multer = require("multer");
+const path = require("path");
+var bodyParser = require("body-parser");
+const timestamp = require("time-stamp");
 
 // database Connection
 connectDatabase();
@@ -23,116 +23,105 @@ connectDatabase();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-console.log(timestamp('MM/DD/YYYY HH:mm:ss'));
+console.log(timestamp("MM/DD/YYYY HH:mm:ss"));
 
 //----------------------------------------Add admin & Login----------------------------------
-
-
+//----------------------------------------Add admin & Login----------------------------------
 app.post("/admin", async (request, response) => {
   try {
-      request.body.password = Bcrypt.hashSync(request.body.password, 10);
-      var user = new Admin(request.body);
-      var result = await user.save();
-       //jwt Token
-       const token = jwt.sign(
-        {
-          username : request.body.username,
-          password : request.body.password
-        },
-         'maxtoys',
-        {
-          expiresIn : "24h"
-        } 
-        );
-      response.json({result,token});
+    request.body.password = Bcrypt.hashSync(request.body.password, 10);
+    var user = new Admin(request.body);
+    var result = await user.save();
+    response.json({ result });
   } catch (error) {
-      response.status(500).send(error);
+    response.status(500).send(error);
   }
 });
-
+//---------------------Login----------------
 app.post("/login", async (request, response) => {
   try {
-      var user = await Admin.findOne({ username: request.body.username }).exec();
-      if(!user) {
-          return response.status(400).send({
-              success : false,
-              message: "The admin does not exist"
-             });
+    var user = await Admin.findOne({ username: request.body.username }).exec();
+    if (!user) {
+      return response.status(400).send({
+        success: false,
+        message: "The admin does not exist",
+      });
+    }
+    if (!Bcrypt.compareSync(request.body.password, user.password)) {
+      return response.status(400).send({
+        success: false,
+        message: "The password is invalid",
+      });
+    }
+    //jwt Token
+    const token = jwt.sign(
+      {
+        username: request.body.username,
+        password: request.body.password,
+      },
+      "maxtoys",     // secrat key
+      {
+        expiresIn: "1h",
       }
-      if(!Bcrypt.compareSync(request.body.password, user.password)) {
-          return response.status(400).send({
-            success : false,
-             message: "The password is invalid"
-             });
-      }
-      //jwt Token
-      const token = jwt.sign(
-        {
-          username : request.body.username,
-          password : request.body.password
-        },
-         'maxtoys',
-        {
-          expiresIn : "24h"
-        } 
-        );
-      response.send({
-        success : true,
-         message: "Admin successfully login.",
-         token
-         });
+    );
+    response.send({
+      success: true,
+      message: "Admin successfully login.",
+      token,
+    });
   } catch (error) {
-      response.status(500).send(error);
+    response.status(500).send(error);
   }
 });
 
 //*************************************Verify Token**************************
 
-const verifyToken =(req, res, next) => {
-  if (req.headers['authorization']) {
-      try {
-          let authorization = req.headers['authorization'].split(' ');
-          if (authorization[0] !== 'Bearer') {
-              return res.status(401).send('invalid request'); //invalid request
-          } else {
-              req.jwt = jwt.verify(authorization[1], 'maxtoys', (err, authData)=>{
-                if(err){
-                  res.json({result : err})
-                }
-                // user
-                  res.json({authData})
-              });
-              return next();
+const verifyToken = (req, res, next) => {
+  if (req.headers["authorization"]) {
+    try {
+      let authorization = req.headers["authorization"].split(" ");
+      if (authorization[0] !== "Bearer") {
+        return res.status(401).json("invalid request"); //invalid request
+      } else {
+        req.jwt = jwt.verify(authorization[1], "maxtoys", (err, authData) => {
+          if (err) {
+            return res.json({ result: err });
           }
-      } catch (err) {
-          return res.status(403).send(); //invalid token
+          // user
+          // return res.json({authData})
+          return next();
+        });
       }
+    } catch (err) {
+      return res.status(403).send(); //invalid token
+    }
   } else {
-      return res.status(401).send('invalid request');
+    return res.status(401).json("invalid request");
   }
-}
+};
 //*************************************Verify Token**************************
 //----------------------------------------Add admin to mongodb----------------------------------
-
-
+//----------------------------------------Add admin to mongodb----------------------------------
 
 //----------------------------------------Post Add data to mongodb----------------------------------
 //----------------------------------------Post Add  data to mongodb----------------------------------
 
 //=========================================for upload image=================
 const storage = multer.diskStorage({
-  destination : './upload/images',
-  filename:  function(req, file, cb){
-    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname) );
-  } 
-})
+  destination: "./upload/images",
+  filename: function (req, file, cb) {
+    cb(
+      null,
+      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
+    );
+  },
+});
 
 const imageUpload = multer({
   storage: storage,
-  limits : { fileSize : 524288 }
-})
+  limits: { fileSize: 524288 },
+});
 //=========================================for upload image=================
-
 
 // function save data to mongodb
 const newMaxtoysData = async (req, res, next) => {
@@ -140,14 +129,14 @@ const newMaxtoysData = async (req, res, next) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ success: false, errors: errors.array() });
   }
-//------------------------for upload image
-// console.log(req.file);
+  //------------------------for upload image
+  // console.log(req.file);
 
-req.body.time =timestamp('MM/DD/YYYY HH:mm:ss');
-// console.log(`http://localhost:3000/image/${req.file.filename}`);
-// console.log(`https://maxtoys-api.herokuapp.com/image/${req.file.filename}`);
-const imageUrl =`https://maxtoys-api.herokuapp.com/image/${req.file.filename}`;
-req.body.image =imageUrl;
+  req.body.time = timestamp("MM/DD/YYYY HH:mm:ss");
+  // console.log(`http://localhost:3000/image/${req.file.filename}`);
+  // console.log(`https://maxtoys-api.herokuapp.com/image/${req.file.filename}`);
+  const imageUrl = `https://maxtoys-api.herokuapp.com/image/${req.file.filename}`;
+  req.body.image = imageUrl;
   const maxtoys = await Maxtoys.create(req.body);
 
   res.status(201).json({
@@ -156,13 +145,13 @@ req.body.image =imageUrl;
   });
 };
 
-app.use('/image', express.static('./upload/images'))
+app.use("/image", express.static("./upload/images"));
 
 //Route for save data
 app.post(
   "/newMaxtoys",
   //------------------------for upload image
-  imageUpload.single('image'),
+  imageUpload.single("image"),
   [
     body("length", "enter length").isLength({ min: 1 }),
     body("width", "enter width").isLength({ min: 1 }),
@@ -170,18 +159,19 @@ app.post(
     // body('barcode', "enter barcode").isLength({ min: 5 }),
     body("shape", "enter shape").isLength({ min: 4 }),
     body("device", "enter device").isLength({ min: 4 }),
-  ], 
+  ],
   newMaxtoysData
 );
 
 //-----------------------------------------------Post  Add data to mongodb----------------------------------
 //-----------------------------------------------Post Add  data to mongodb----------------------------------
-function errHandler(err, req, res, next){
-  if(err instanceof multer.MulterError){
+//---------iamge upload errorHandler-----------
+function errHandler(err, req, res, next) {
+  if (err instanceof multer.MulterError) {
     res.json({
-      success:false,
-      message : err.message
-    })
+      success: false,
+      message: err.message,
+    });
   }
 }
 app.use(errHandler);
@@ -243,7 +233,7 @@ const getMextoys = async (req, res, next) => {
     maxtoys,
   });
 };
-app.get("/getMaxtoys", verifyToken , getMextoys);
+app.get("/getMaxtoys", getMextoys);
 
 //------------------------------------------------Get data to mongodb----------------------------------
 //------------------------------------------------Get data to mongodb----------------------------------
@@ -272,11 +262,11 @@ const updateMaxData = async (req, res, next) => {
   }
 };
 
-app.get("/update", updateMaxData);
+app.get("/update", verifyToken, updateMaxData);
 //------------------------------------------------update data to mongodb----------------------------------
 //------------------------------------------------update data to mongodb----------------------------------
 
-app.get("/test", (req, resp) => {
+app.get("/test", verifyToken, (req, resp) => {
   resp.json({
     success: true,
     Name: "This is Testing Api!",
