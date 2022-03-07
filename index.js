@@ -268,6 +268,25 @@ app.get("/update", verifyToken, updateMaxData);
 //------------------------------------------------update data to mongodb----------------------------------
 //------------------------------------------------update data to mongodb----------------------------------
 
+
+
+//------------------------------------------------suggestions----------------------------------
+//------------------------------------------------suggestions----------------------------------
+app.get("/suggestion", async(req, res)=>{
+  let fieldName = req.query.fieldName;
+  const totalCount = await Maxtoys.countDocuments();  
+  let searchTerm = new RegExp(req.query.searchTerm, "i");
+  let data = await Maxtoys.find({ [fieldName] : searchTerm })
+  res.json({
+    totalCount,
+    suggestionCount : data.length,
+    data
+  })  
+})
+//------------------------------------------------suggestions----------------------------------
+//------------------------------------------------suggestions----------------------------------
+
+
 app.get("/test", verifyToken, (req, resp) => {
   resp.json({
     success: true,
