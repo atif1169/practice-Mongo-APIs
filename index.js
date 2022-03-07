@@ -14,13 +14,13 @@ const multer = require("multer");
 const path = require("path");
 var bodyParser = require("body-parser");
 const timestamp = require("time-stamp");
-var cors = require('cors');
+var cors = require("cors");
 
 // database Connection
 connectDatabase();
 
 // app.use(express.json());
-app.use(cors({origin: '*'}));
+app.use(cors({ origin: "*" }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -60,7 +60,7 @@ app.post("/login", async (request, response) => {
         username: request.body.username,
         password: request.body.password,
       },
-      "maxtoys",     // secrat key
+      "maxtoys", // secrat key
       {
         expiresIn: "24h",
       }
@@ -86,7 +86,7 @@ const verifyToken = (req, res, next) => {
       } else {
         req.jwt = jwt.verify(authorization[1], "maxtoys", (err, authData) => {
           if (err) {
-            return res.json({ result: err , status:500});
+            return res.json({ result: err, status: 500 });
           }
           // user
           // return res.json({authData})
@@ -205,7 +205,7 @@ const getMextoys = async (req, res, next) => {
 
     return res.json({
       success: true,
-      status:200,
+      status: 200,
       totalCount,
       count: search_term.length,
       pageNo,
@@ -228,7 +228,7 @@ const getMextoys = async (req, res, next) => {
 
   return res.status(200).json({
     success: true,
-    status:200,
+    status: 200,
     totalCount,
     count: maxtoys.length,
     pageNo,
@@ -269,44 +269,38 @@ app.get("/update", verifyToken, updateMaxData);
 //------------------------------------------------update data to mongodb----------------------------------
 //------------------------------------------------update data to mongodb----------------------------------
 
-
-
 //------------------------------------------------suggestions----------------------------------
 //------------------------------------------------suggestions----------------------------------
-app.get("/suggestion", async(req, res)=>{
-  if (!req.query.searchTerm) {
-    const data = [];
-    return res.json(data);
-  }
+const uniqueArray = (data, colName) => {
+  const array = data.map((label) => label[colName]);
+  const LowerArr = array.map((x) => x.toLowerCase());
+  return [...new Set(LowerArr)];
+};
+app.get("/suggestion", async (req, res) => {
+  try {
+    if (!req.query.searchTerm) {
+      const data = [];
+      return res.json(data);
+    }
     let fieldName = req.query.fieldName;
-  const totalCount = await Maxtoys.countDocuments();  
-  let searchTerm = new RegExp(req.query.searchTerm, "i");
-  let data = await Maxtoys.find({ [fieldName] : searchTerm },  {[fieldName]: 1, _id:0})
-  if (fieldName == 'name'){
-    let obj = data.map((label) => label.name ); 
-  res.json({
-    totalCount,
-    data : obj
-  })
-}
-  if (fieldName == 'customer'){
-    let obj = data.map((label) => label.customer ); 
-  res.json({
-    totalCount,
-    data : obj
-  })
-}
-  if (fieldName == 'supplier'){
-    let obj = data.map((label) => label.supplier ); 
-  res.json({
-    totalCount,
-    data : obj
-  })
-}
-})
+    const totalCount = await Maxtoys.countDocuments();
+    let searchTerm = new RegExp(req.query.searchTerm, "i");
+    let data = await Maxtoys.find(
+      { [fieldName]: searchTerm },
+      { [fieldName]: 1, _id: 0 }
+    );
+    res.json({
+      totalCount,
+      data: uniqueArray(data, fieldName),
+    });
+  } catch (err) {
+    res.json({
+      error: err.message,
+    });
+  }
+});
 //------------------------------------------------suggestions----------------------------------
 //------------------------------------------------suggestions----------------------------------
-
 
 app.get("/test", verifyToken, (req, resp) => {
   resp.json({
