@@ -273,7 +273,7 @@ app.get("/update", verifyToken, updateMaxData);
 
 //------------------------------------------------suggestions----------------------------------
 //------------------------------------------------suggestions----------------------------------
-app.get("/suggestion", verifyToken, async(req, res)=>{
+app.get("/suggestion", async(req, res)=>{
   if (!req.query.searchTerm) {
     const data = [];
     return res.json(data);
