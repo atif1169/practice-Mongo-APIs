@@ -282,11 +282,27 @@ app.get("/suggestion", async(req, res)=>{
   const totalCount = await Maxtoys.countDocuments();  
   let searchTerm = new RegExp(req.query.searchTerm, "i");
   let data = await Maxtoys.find({ [fieldName] : searchTerm },  {[fieldName]: 1, _id:0})
+  if (fieldName == 'name'){
+    let obj = data.map((label) => label.name ); 
   res.json({
     totalCount,
-    suggestionCount : data.length,
-    data
+    data : obj
   })
+}
+  if (fieldName == 'customer'){
+    let obj = data.map((label) => label.customer ); 
+  res.json({
+    totalCount,
+    data : obj
+  })
+}
+  if (fieldName == 'supplier'){
+    let obj = data.map((label) => label.supplier ); 
+  res.json({
+    totalCount,
+    data : obj
+  })
+}
 })
 //------------------------------------------------suggestions----------------------------------
 //------------------------------------------------suggestions----------------------------------
