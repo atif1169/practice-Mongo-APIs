@@ -14,12 +14,13 @@ const multer = require("multer");
 const path = require("path");
 var bodyParser = require("body-parser");
 const timestamp = require("time-stamp");
+var cors = require('cors');
 
 // database Connection
 connectDatabase();
 
 // app.use(express.json());
-
+app.use(cors({origin: '*'}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
