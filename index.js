@@ -277,7 +277,7 @@ app.get("/suggestion", async(req, res)=>{
   let fieldName = req.query.fieldName;
   const totalCount = await Maxtoys.countDocuments();  
   let searchTerm = new RegExp(req.query.searchTerm, "i");
-  let data = await Maxtoys.find({ [fieldName] : searchTerm })
+  let data = await Maxtoys.find({ [fieldName] : searchTerm },  {[fieldName]: 1})
   res.json({
     totalCount,
     suggestionCount : data.length,
