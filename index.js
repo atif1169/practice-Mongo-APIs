@@ -273,8 +273,12 @@ app.get("/update", verifyToken, updateMaxData);
 
 //------------------------------------------------suggestions----------------------------------
 //------------------------------------------------suggestions----------------------------------
-app.get("/suggestion", async(req, res)=>{
-  let fieldName = req.query.fieldName;
+app.get("/suggestion", verifyToken, async(req, res)=>{
+  if (!req.query.searchTerm) {
+    const data = [];
+    return res.json(data);
+  }
+    let fieldName = req.query.fieldName;
   const totalCount = await Maxtoys.countDocuments();  
   let searchTerm = new RegExp(req.query.searchTerm, "i");
   let data = await Maxtoys.find({ [fieldName] : searchTerm },  {[fieldName]: 1, _id:0})
@@ -282,7 +286,7 @@ app.get("/suggestion", async(req, res)=>{
     totalCount,
     suggestionCount : data.length,
     data
-  })  
+  })
 })
 //------------------------------------------------suggestions----------------------------------
 //------------------------------------------------suggestions----------------------------------
